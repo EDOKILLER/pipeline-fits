@@ -1,0 +1,97 @@
+PIPELINE FITS 1.4 - dall'immagine grezza all'analisi scientifica
+================================================================
+© 2026 Edoardo Battistel
+Per FITS di telescopi spaziali e a terra, in qualsiasi banda (UV, visibile,
+infrarosso, raggi X...). Funziona su Ubuntu/Linux e Windows 11.
+
+File di questa cartella
+-----------------------
+  pipeline_fits.py             il programma (finestra)
+  motore_pipeline.py           i calcoli (deve stare accanto a pipeline_fits.py)
+  openngc_compatto.csv         catalogo NGC/IC/Messier per gli oggetti con nome senza Internet
+  OpenNGC_licenza_CC-BY-SA-4.0.txt  licenza del catalogo (OpenNGC di Mattia Verga,
+                               https://github.com/mattiaverga/OpenNGC)
+  crea_eseguibile_ubuntu.sh    crea l'eseguibile per Ubuntu
+  crea_eseguibile_windows.bat  crea PipelineFITS.exe per Windows 11
+
+Creare l'eseguibile (una volta per sistema)
+-------------------------------------------
+UBUNTU:   cd ~/Claude/Astropy/programma_pipeline_fits/versione_1.4
+          bash crea_eseguibile_ubuntu.sh
+WINDOWS:  installa Python da python.org ("Add python.exe to PATH"),
+          poi doppio clic su crea_eseguibile_windows.bat
+Alla fine viene eseguito un AUTOTEST completo su immagini sintetiche
+(deve dire "AUTOTEST SUPERATO") e una prova di SIMBAD.
+
+Le sezioni (si aprono e chiudono con un clic sul titolo)
+--------------------------------------------------------
+1. CARTELLA MADRE E FILE
+   - "Scegli la cartella madre": la cartella con i FITS (anche in sottocartelle).
+   - "Rinomina e copia": ogni FITS prende il nome del suo filtro (f090.fits,
+     f1130.fits; doppioni f090a, f090b) e viene copiato nella cartella madre,
+     verificando che la copia sia identica. Poi chiede se cancellare gli originali.
+   - Tabella dei file: clic su una riga = includi / escludi.
+   - Memoria: Ibrida (consigliata), Solo RAM (veloce), Solo disco (poca RAM).
+   - Le anteprime usano un ritaglio a piena risoluzione (lato regolabile);
+     "Scegli la zona delle anteprime" per spostarlo. I risultati finali usano
+     sempre l'immagine intera.
+
+2. RIDUZIONE DEL RUMORE  -  3. SOTTRAZIONE DEL FONDO  -  4. STRETCHING
+   Per ogni file: scegli algoritmo e valori (lista modificabile, con
+   predefiniti), premi "Calcola le anteprime" e CLICCA sull'immagine migliore.
+   La scelta viene salvata e si passa da soli al file successivo.
+   - Rumore: la prima immagine ha solo lo stretching (riferimento).
+   - Fondo: la prima immagine è senza sottrazione (cliccala per non sottrarre).
+   - Stretching: "Tutti i tipi" mostra ogni stretching con i suoi valori;
+     la spunta "Applica la sottrazione del fondo" si può togliere per file.
+     Pixel rovinati: ricostruzione automatica delle zone nere interne, oppure
+     disegna un rettangolo sulla zona; o "Scarta questo file".
+   Nelle intestazioni: valore usato e SNR medio. L'SNR è misurato sempre sugli
+   stessi pixel con segnale, con il rumore da pixel a pixel: serve a
+   confrontare le immagini affiancate tra loro.
+
+5. STACK IN BIANCO E NERO
+   Riproietta i file con le coordinate WCS (dimensioni e rotazioni diverse
+   vanno bene) sulla griglia del file di riferimento o su un mosaico che li
+   contiene tutti, orientato come le immagini (niente angoli vuoti). Il file di
+   riferimento proposto è quello con i pixel più piccoli (massima risoluzione).
+   Ritaglio: disegnalo sull'immagine (anche quadrato) oppure usa il ritaglio
+   automatico, che toglie i bordi senza dati. Vale anche per l'RGB; le
+   coordinate WCS vengono aggiornate. "Riduzione risoluzione" 2 = metà per lato. Combinazione:
+   media pesata (pesi per filtro), mediana o massimo.
+   "Salva" scrive stack_bn.fits (con WCS) e stack_bn.tif/.png/.jpg.
+
+6. STACK RGB
+   "Prepara le immagini", poi "Colorazione automatica" (ordine cromatico per
+   lunghezza d'onda) oppure regola le barre R, G, B di ogni filtro:
+   l'anteprima cambia mentre muovi le barre. "Salva" scrive stack_rgb.fits
+   (cubo a 3 piani con WCS) e l'immagine nel formato scelto.
+
+7. ANALISI SCIENTIFICHE  (su stack_bn.fits)
+   Coordinate con griglia leggera, mappa SNR, gradiente (fronti d'urto),
+   strutture fini, isofote, sorgenti rilevate (+ CSV), istogramma, profilo
+   radiale (+ CSV), oggetti con nome con croce e nome, limitati ai più famosi
+   (+ oggetti_nel_campo.csv con tutti). Fonte: SIMBAD via Internet (server CDS
+   o mirror Harvard); se non risponde, il catalogo OpenNGC incluso nel
+   programma (NGC, IC, Messier e nomi comuni), che funziona senza Internet.
+
+File salvati nella cartella madre
+---------------------------------
+  pipeline_stato.json     tutte le scelte (si riprende da dove si era rimasti)
+  pipeline_log.txt        LOG: rumore, fondo, stretching scelti per ogni file,
+                          stack, pesi RGB e cronologia
+  stack_bn.*, stack_rgb.*, analisi_*.*, *.csv
+  _pipeline_cache/        file temporanei e risultati intermedi (si può
+                          cancellare quando il lavoro è finito)
+
+Autore e firma
+--------------
+  Il titolo della finestra e la riga in basso riportano «© 2026 Edoardo Battistel»;
+  "ℹ Informazioni" in alto a destra mostra versione e autore.
+  I FITS salvati hanno nell'intestazione AUTHOR = Edoardo Battistel e
+  CREATOR = Pipeline FITS 1.4. Con la casella "Firma © sulle immagini salvate"
+  (in alto, attiva di base) le immagini TIFF/PNG/JPEG di stack, RGB e analisi
+  hanno la scritta «© Edoardo Battistel» piccola in basso a destra.
+
+Dimensione del testo: A− / A+ in alto, oppure Ctrl + / Ctrl −.
+Errori dell'eseguibile: ~/.pipeline_fits.log

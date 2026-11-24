@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below, and credit the data providers listed in README.md."
+title: "Pipeline FITS: from the raw FITS image to the scientific analysis (predecessor of AutoAstroPipe)"
+authors:
+  - family-names: Battistel
+    given-names: Edoardo
+version: "1.4"
+date-released: 2026-10-30
+license: BSD-3-Clause
+repository-code: "https://github.com/EDOKILLER/pipeline-fits"
+keywords:
+  - FITS
+  - pipeline
+  - image processing
